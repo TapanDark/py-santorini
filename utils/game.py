@@ -19,6 +19,11 @@ class Game(object):
                 self.running = False
             if event.type == pygame.VIDEORESIZE:
                 self.resize(event)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = event.pos
+                row, col = self.board.getTileFromCoordinates(x, y)
+                if row is not None and col is not None and self.board.pieces[row * 5 + col].floors < 4:
+                    self.board.pieces[row * 5 + col].floors = self.board.pieces[row * 5 + col].floors + 1
 
     def update(self):
         pass

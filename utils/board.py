@@ -19,6 +19,23 @@ BUILDING_COLOR = (192, 192, 192)  # SILVER
 DOME_COLOR = (0, 0, 139)  # DARK BLUE
 
 
+class Tile(object):
+    def __init__(self):
+        self._player = 0
+        self._floors = 0
+
+    @property
+    def floors(self):
+        return self._floors
+
+    @floors.setter
+    def floors(self, value):
+        assert value >= 0
+        assert value <= 4
+        assert type(value) == int
+        self._floors = value
+
+
 class Board(object):
 
     def __init__(self, windowWidth, windowHeight):
@@ -26,11 +43,7 @@ class Board(object):
         self.windowHeight = 0
         self.minDimension = 0
         self.resize(windowWidth, windowHeight)
-        self.pieces = [0] * 25
-        self.pieces[16] = FIRST_FLOOR | SECOND_FLOOR | THIRD_FLOOR | DOME
-        self.pieces[4] = FIRST_FLOOR | SECOND_FLOOR
-        self.pieces[10] = FIRST_FLOOR | SECOND_FLOOR | THIRD_FLOOR
-        self.pieces[23] = FIRST_FLOOR
+        self.pieces = [Tile() for i in range(0, 25)]
 
     def resize(self, windowWidth, windowHeight):
         self.windowWidth = windowWidth
@@ -74,10 +87,10 @@ class Board(object):
                              (self.x + i * self.tileSide, self.y + self.side), BOARD_THICK)
 
     def drawPieces(self, win):
-        for pos, pieceCode in enumerate(self.pieces):
+        for pos, tileData in enumerate(self.pieces):
             row = pos / 5
             col = pos % 5
-            self.drawPieceOnTile(win, pieceCode, row, col)
+            self.drawPieceOnTile(win, tileData, row, col)
 
     def getPiece(self, row, col):
         assert row >= 0
@@ -86,20 +99,20 @@ class Board(object):
         assert col <= 4
         return self.pieces[row * 5 + col]
 
-    def drawPieceOnTile(self, win, pieceCode, row, col):
+    def drawPieceOnTile(self, win, tileData, row, col):
         floorHeight = 0
         xOrg, yOrg = self._getTileCoordinates(row, col)
-        if pieceCode & FIRST_FLOOR:
+        if tileData.floors > 0:
             floorHeight += 0.2
             pygame.draw.rect(win, BUILDING_COLOR,
                              (xOrg + self.tileSide * 0.1, yOrg + self.tileSide * 0.75, self.tileSide * 0.82,
                               self.tileSide * 0.2), 1)
-        if pieceCode & SECOND_FLOOR:
+        if tileData.floors > 1:
             floorHeight += 0.18
             pygame.draw.rect(win, BUILDING_COLOR,
                              (xOrg + self.tileSide * 0.2, yOrg + self.tileSide * 0.59, self.tileSide * 0.62,
                               self.tileSide * 0.18), 1)
-        if pieceCode & THIRD_FLOOR:
+        if tileData.floors > 2:
             floorHeight += 0.15
             width = self.tileSide * 0.42
             pygame.draw.rect(win, BUILDING_COLOR,
@@ -110,7 +123,7 @@ class Board(object):
                                  (xOrg + self.tileSide * 0.3 + width / 5 * i, yOrg + self.tileSide * 0.44),
                                  (xOrg + self.tileSide * 0.3 + width / 5 * i, yOrg + self.tileSide * 0.59), 1)
 
-        if pieceCode & DOME:
+        if tileData.floors > 3:
             floorHeight += 1
             pygame.draw.arc(win, DOME_COLOR,
                             (xOrg + self.tileSide * 0.3, yOrg + self.tileSide * 0.30, self.tileSide * 0.42,
@@ -125,3 +138,12 @@ class Board(object):
         x = self.x + col * self.tileSide
         y = self.y + row * self.tileSide
         return x, y
+
+    def getTileFromCoordinates(self, x, y):
+        if x < self.x or x > self.x + self.width:
+            return None, None
+        if y < self.y or y > self.y + self.height:
+            return None, None
+        col = (x - self.x) / self.tileSide
+        row = (y - self.y) / self.tileSide
+        return row, col
