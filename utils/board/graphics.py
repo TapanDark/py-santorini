@@ -36,7 +36,7 @@ class BoardGraphics(object):
                              (self.x + i * self.tileSide, self.y + self.side), BOARD_THICK)
 
     def drawPieces(self, win):
-        for pos, tileData in enumerate(self.boardObj.pieces):
+        for pos, tileData in enumerate(self.boardObj.tiles):
             row = pos / 5
             col = pos % 5
             self._drawPieceOnTile(win, tileData, row, col)

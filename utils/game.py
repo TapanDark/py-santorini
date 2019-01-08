@@ -2,13 +2,15 @@ import pygame
 
 from utils.board.board import Board
 
+DEBUG_INIT_BOARD_STR = "t24f2,t7p1,t1p1,t8f3p2,t9p2"
+
 
 class Game(object):
     def __init__(self, win):
         self.window = win
         videoInfo = pygame.display.Info()
         self.width, self.height = videoInfo.current_w, videoInfo.current_h
-        self.board = Board()
+        self.board = Board(DEBUG_INIT_BOARD_STR)
         self.board.graphics.resize(windowWidth=self.width, windowHeight=self.height)
         self.clock = pygame.time.Clock()
         self.running = True
@@ -23,8 +25,8 @@ class Game(object):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
                 row, col = self.board.getTileFromPixel(x, y)
-                if row is not None and col is not None and self.board.pieces[row * 5 + col].floors < 4:
-                    self.board.pieces[row * 5 + col].floors = self.board.pieces[row * 5 + col].floors + 1
+                if row is not None and col is not None and self.board.tiles[row * 5 + col].floors < 4:
+                    self.board.tiles[row * 5 + col].floors = self.board.tiles[row * 5 + col].floors + 1
 
     def update(self):
         pass
