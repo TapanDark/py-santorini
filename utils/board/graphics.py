@@ -67,7 +67,7 @@ class BoardGraphics(object):
 
     def _drawPieceOnTile(self, win, tileData, row, col):
         groundHeightScale = self._drawBuildingsOnTile(win, tileData.floors, row, col)
-        self._drawPlayerOnTile(win, tileData._player, groundHeightScale, row, col)
+        self._drawPlayerOnTile(win, tileData.player, groundHeightScale, row, col)
 
     def _drawBuildingsOnTile(self, win, floors, row, col):
         groundHeightScale = 0.05

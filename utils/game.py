@@ -39,6 +39,7 @@ class Game(object):
     def resize(self, resizeEvent):
         width = max(resizeEvent.w, 430)
         height = max(resizeEvent.h, 430)
+        pygame.display.set_mode((width, height), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.RESIZABLE)
         self.board.graphics.resize(width, height)
 
     def run(self):
