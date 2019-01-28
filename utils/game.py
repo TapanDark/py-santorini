@@ -47,5 +47,8 @@ class Game(object):
             self.processEvents()
             self.update()
             self.draw(self.window)
+            import pdb
+            pdb.set_trace()
+            print(self.board.isValidMove(self.board._parseMoveStr("m1-2,b3")))
             self.clock.tick(60)  # limit to 60 FPS
         pygame.quit()

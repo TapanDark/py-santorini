@@ -1,5 +1,4 @@
 import re
-import itertools
 
 from graphics import BoardGraphics
 
@@ -83,8 +82,8 @@ class Board(object):
                 continue
             bMoveMatch = self._buildPattern.search(moveStr)
             if bMoveMatch:
-                sequence.append(('b', int(pMoveMatch.group(1))))
-        return
+                sequence.append(('b', int(bMoveMatch.group(1))))
+        return sequence
 
     def isAdjacent(self, origin, target):
         orgRow, orgCol = self.indexToRowCol(origin)
@@ -93,9 +92,11 @@ class Board(object):
 
     def _standardMoveValidator(self, move):
         def isLegalPlayerMove(move):
-            if not len(move) == 3:
+            if len(move) != 3:
                 return False
-            if not move[0] == 'p':
+            if move[0] != 'm':
+                return False
+            if move[1] == move[2]:
                 return False
             if not 0 <= move[1] <= 24:
                 return False
@@ -103,28 +104,30 @@ class Board(object):
                 return False
             if not self.isAdjacent(move[1], move[2]):
                 return False
-            if not self.tiles[move[1]].player < 0:
+            if self.tiles[move[1]].player < 0:
                 return False
-            if not self.tiles[move[2]].player < 0:
+            if self.tiles[move[2]].player != 0:
                 return False
-            if not self.tiles[move[2]].floors < 4:
+            if self.tiles[move[2]].floors >= 4:
                 return False
             if not self.tiles[move[2]].floors - self.tiles[move[1]].floors <= 1:
                 return False
+            return True
 
-        def isLegalBuild(pos, move):
-            if not move[0] == 'b':
+        def isLegalBuild(pos, buildMove):
+            if buildMove[0] != 'b':
                 return False
-            if not 0 <= move[1] <= 24:
+            if not 0 <= buildMove[1] <= 24:
                 return False
-            if not self.isAdjacent(pos, move[1]):
+            if not self.isAdjacent(pos, buildMove[1]):
                 return False
-            if self.tiles[move[1]].floors >= 4:
+            if self.tiles[buildMove[1]].floors >= 4:
                 return False
-            if self.tiles[move[1]].player > 0:
+            if self.tiles[buildMove[1]].player > 0:
                 return False
+            return True
 
-        return len(move) == 2 and isLegalPlayerMove(move[0] and isLegalBuild(move[0][2], move[1]))
+        return len(move) == 2 and isLegalPlayerMove(move[0]) and isLegalBuild(move[0][2], move[1])
 
     def isValidMove(self, moveSequence):
         # This will change based on ability cards.
